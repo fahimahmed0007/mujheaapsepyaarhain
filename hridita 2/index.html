@@ -7,7 +7,7 @@
     <style>
         /* --- DYNAMIC THEME --- */
         body {
-            /* PAGE 1 & 2: Hamster Pleading */
+            /* PAGE 1 START: Hamster Pleading */
             background: url('hamster-pleading.gif') no-repeat center center fixed; 
             background-size: cover;
             
@@ -23,7 +23,7 @@
             transition: background 0.5s ease;
         }
 
-        /* LIGHTER Overlay */
+        /* Overlay */
         .overlay {
             position: fixed;
             top: 0; left: 0;
@@ -32,15 +32,14 @@
             z-index: 0;
         }
 
-        /* Container Style - TRANSPARENT */
+        /* Container Style */
         .container {
             width: 85%;
             max-width: 500px;
-            padding: 30px;
+            padding: 25px;
             background: rgba(0, 0, 0, 0.3); 
             border: 1px solid rgba(255, 105, 180, 0.6);
             border-radius: 20px;
-            backdrop-filter: none; 
             box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
             position: relative;
             z-index: 10;
@@ -48,10 +47,10 @@
 
         /* Text Styles */
         p.shayari {
-            font-size: 1.2rem;
-            line-height: 1.6;
+            font-size: 1.1rem;
+            line-height: 1.5;
             color: #fff;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-shadow: 2px 2px 4px #000, 0 0 10px #FF69B4;
             font-weight: bold;
         }
@@ -59,11 +58,20 @@
         .highlight {
             color: #FF69B4;
             font-weight: bold;
-            font-size: 1.8rem;
+            font-size: 1.6rem;
             display: block;
             margin-top: 25px;
             text-shadow: 3px 3px 0 #000, 0 0 15px #FF69B4;
             text-transform: uppercase;
+        }
+        
+        /* Specific style for the plea text */
+        .plea-text {
+            color: #FF69B4; /* Pink text for the plea */
+            font-size: 1.2rem;
+            margin-top: 20px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
         }
 
         /* Buttons */
@@ -75,7 +83,7 @@
             align-items: center;
             gap: 20px; 
             min-height: 60px;
-            flex-wrap: wrap; /* Allows text to wrap if button is long */
+            flex-wrap: wrap;
         }
 
         button {
@@ -98,9 +106,8 @@
             z-index: 100;
         }
         
-        /* Special style for the long button */
         #forceYesBtn {
-            white-space: normal; /* Allow text to wrap */
+            white-space: normal;
             font-size: 0.9rem;
             padding: 15px 20px;
         }
@@ -124,24 +131,11 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .music-note {
-            margin-top: 20px;
-            font-size: 0.9rem;
-            color: #fff;
-            cursor: pointer;
-            text-decoration: underline;
-            text-shadow: 1px 1px 2px #000;
-        }
-
     </style>
 </head>
 <body>
 
     <div class="overlay"></div>
-
-    <audio id="bgMusic">
-        <source src="song.mp3" type="audio/mpeg">
-    </audio>
 
     <div class="container" id="proposal-page">
         <div class="shayari">
@@ -162,9 +156,16 @@
 
     <div class="container" id="pleading-page">
         <div class="shayari">
-            <p>Wait... kyun nahi? 🥺</p>
-            <p>Ek baar aur soch lo... Dil toot jayega mera 💔</p>
-            <p>Is decision ko reconsider karna padega!</p>
+            <p>Na dhuaan maar sakega, na koi sadma maarega,<br>
+            Na qaza maaregi mujhko, na ye zamana maarega.</p>
+
+            <p>Jo kheech le jaan is seene se mere,<br>
+            Bas ek tera na hona, ye tasavvur hi mujhe jeete-ji maar dega.</p>
+
+            <p class="plea-text">
+                Aapke bagair kaun hain mere...<br>
+                minaat hain aapse maan jaaona please 🥺
+            </p>
         </div>
 
         <div class="btn-group">
@@ -181,10 +182,6 @@
             <p>Kyunki meri har saans ab aapki mohabbat ki mohtaaj lagti hai.</p>
             
             <h1 style="font-size: 3rem;">❤️</h1>
-            
-            <div class="music-note" onclick="document.getElementById('bgMusic').play()">
-                🎵 Tap here if music doesn't play
-            </div>
         </div>
     </div>
 
@@ -197,21 +194,22 @@
         const proposalPage = document.getElementById('proposal-page');
         const pleadingPage = document.getElementById('pleading-page');
         const successPage = document.getElementById('success-page');
-        
-        const audio = document.getElementById('bgMusic');
 
         // Counter for "No" attempts
         let noClickCount = 0;
 
         // --- LOGIC FOR NO BUTTON ---
         const handleNoInteraction = () => {
-            noClickCount++; // Increase count by 1
+            noClickCount++; 
 
-            // If she tries more than 5 times...
-            if (noClickCount > 5) {
-                proposalPage.style.display = 'none'; // Hide Question
-                pleadingPage.style.display = 'block'; // Show Pleading Page
-                return; // Stop moving the button
+            // If she tries 5 times, switch to Pleading Page
+            if (noClickCount >= 5) {
+                proposalPage.style.display = 'none'; 
+                pleadingPage.style.display = 'block'; 
+                
+                // FORCE BACKGROUND CHANGE TO KITTY
+                document.body.style.backgroundImage = "url('kitty.gif')";
+                return; 
             }
 
             // Otherwise, keep running away
@@ -229,27 +227,21 @@
         noBtn.addEventListener('click', handleNoInteraction);
         noBtn.addEventListener('touchstart', handleNoInteraction);
 
-        // --- LOGIC FOR NORMAL YES BUTTON ---
+        // --- LOGIC FOR YES BUTTONS ---
         yesBtn.addEventListener('click', () => {
             goToSuccess();
         });
 
-        // --- LOGIC FOR PLEADING PAGE BUTTON ---
         forceYesBtn.addEventListener('click', () => {
-            pleadingPage.style.display = 'none'; // Hide Pleading
-            goToSuccess(); // Go to success
+            pleadingPage.style.display = 'none'; 
+            goToSuccess(); 
         });
 
-        // --- SHARED SUCCESS FUNCTION ---
+        // --- SUCCESS FUNCTION ---
         function goToSuccess() {
             proposalPage.style.display = 'none';
             successPage.style.display = 'block';
-
-            // Switch Background to Cat GIF
             document.body.style.backgroundImage = "url('animation.gif')"; 
-            
-            // Play Music
-            audio.play().catch(e => console.log("Audio requires interaction"));
         }
     </script>
 </body>
