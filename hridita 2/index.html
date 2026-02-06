@@ -15,7 +15,7 @@
             background-size: cover;
             
             color: #FFB7B2;
-            font-family: 'Nunito', sans-serif; /* Default clean font */
+            font-family: 'Nunito', sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -31,11 +31,11 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4); /* Slightly darker for better text read */
+            background: rgba(0, 0, 0, 0.3);
             z-index: 0;
         }
 
-        /* Floating Hearts Animation Background */
+        /* Floating Hearts Animation */
         .hearts-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -61,18 +61,18 @@
             width: 85%;
             max-width: 500px;
             padding: 25px;
-            background: rgba(0, 0, 0, 0.5); /* Glass effect */
+            background: rgba(0, 0, 0, 0.6); 
             border: 2px solid rgba(255, 105, 180, 0.6);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
             position: relative;
             z-index: 10;
-            backdrop-filter: blur(3px); /* Blur background slightly */
+            backdrop-filter: blur(3px);
         }
 
         /* Text Styles */
         p.shayari {
-            font-family: 'Nunito', sans-serif; /* Clean font for reading */
+            font-family: 'Nunito', sans-serif;
             font-size: 1.1rem;
             line-height: 1.5;
             color: #fff;
@@ -81,12 +81,11 @@
             font-weight: 700;
         }
 
-        /* The BIG Question & Titles get the Handwriting Font */
         .highlight, h1 {
             font-family: 'Sacramento', cursive;
             color: #FF69B4;
             font-weight: normal;
-            font-size: 2.5rem; /* Bigger for cursive */
+            font-size: 2.5rem;
             display: block;
             margin-top: 15px;
             text-shadow: 2px 2px 2px #000, 0 0 15px #FF69B4;
@@ -124,10 +123,6 @@
             transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        button:active {
-            transform: scale(0.95);
-        }
-
         #yesBtn, #forceYesBtn {
             background-color: #FF69B4;
             color: #fff;
@@ -142,12 +137,14 @@
             padding: 15px 25px;
         }
 
+        /* --- NO BUTTON --- */
         #noBtn {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 2px solid #FF69B4;
-            position: relative;
-            z-index: 1;
+            background: #000; /* Dark Black */
+            color: #fff;      /* White Text */
+            border: 2px solid #FF69B4; 
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+            position: relative; /* Starts relative */
+            z-index: 9999; /* Ensure it floats ABOVE everything */
         }
 
         /* Hide pages by default */
@@ -166,7 +163,6 @@
 <body>
 
     <div class="overlay"></div>
-    
     <div class="hearts-container" id="hearts-container"></div>
 
     <div class="container" id="proposal-page">
@@ -196,7 +192,7 @@
 
             <p class="plea-text">
                 Aapke bagair kaun hain mere...<br>
-                minaat hain aapse maan jaaona please 🥺🙏
+                minaat hain aapse maan jaaona please 🥺
             </p>
         </div>
 
@@ -213,33 +209,26 @@
             <p>Dil dhoondta hai panaah sirf aapke saaye mein har ghadi,</p>
             <p>Kyunki meri har saans ab aapki mohabbat ki mohtaaj lagti hai.</p>
             
-            <h1 style="font-size: 3.5rem;">mujhe aapse be-inteha mohobbat hain ❤️</h1>
+            <h1 style="font-size: 3.5rem;">mujhe aapse be-inteha ishq hain❤️</h1>
         </div>
     </div>
 
     <script>
-        // --- 1. FLOATING HEARTS LOGIC ---
+        // --- HEARTS LOGIC ---
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart');
             heart.innerHTML = '❤';
             heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 4 + 's'; // 4s to 7s speed
-            heart.style.fontSize = Math.random() * 20 + 15 + 'px'; // Random size
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's'; 
+            heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
             
             document.getElementById('hearts-container').appendChild(heart);
-            
-            // Remove heart after animation to keep browser clean
-            setTimeout(() => {
-                heart.remove();
-            }, 7000);
+            setTimeout(() => { heart.remove(); }, 7000);
         }
-
-        // Create a new heart every 300ms
         setInterval(createHeart, 300);
 
-
-        // --- 2. BUTTON LOGIC ---
+        // --- BUTTON LOGIC ---
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const forceYesBtn = document.getElementById('forceYesBtn');
@@ -260,14 +249,24 @@
                 return; 
             }
 
-            const maxX = window.innerWidth - noBtn.offsetWidth - 50;
-            const maxY = window.innerHeight - noBtn.offsetHeight - 50;
-            const randomX = Math.random() * maxX;
-            const randomY = Math.random() * maxY;
+            // --- FIXED MATH FOR SAFE ZONE ---
+            // Get the width/height of the button
+            const btnWidth = noBtn.offsetWidth;
+            const btnHeight = noBtn.offsetHeight;
+            
+            // Get the safe area (Screen size minus button size minus 20px padding)
+            const maxLeft = window.innerWidth - btnWidth - 20;
+            const maxTop = window.innerHeight - btnHeight - 20;
 
+            // Generate random positions ensuring they are never negative
+            // Math.max(0, ...) ensures it never goes off the top/left
+            const randomLeft = Math.max(0, Math.floor(Math.random() * maxLeft));
+            const randomTop = Math.max(0, Math.floor(Math.random() * maxTop));
+
+            // Apply the new position
             noBtn.style.position = 'fixed'; 
-            noBtn.style.left = randomX + 'px';
-            noBtn.style.top = randomY + 'px';
+            noBtn.style.left = randomLeft + 'px';
+            noBtn.style.top = randomTop + 'px';
         };
 
         noBtn.addEventListener('mouseover', handleNoInteraction);
@@ -288,4 +287,3 @@
     </script>
 </body>
 </html>
-
