@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>For My Universe</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Nunito:wght@700&display=swap" rel="stylesheet">
@@ -21,12 +21,11 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* Stops scrolling */
             text-align: center;
             transition: background 0.5s ease;
         }
 
-        /* Overlay */
         .overlay {
             position: fixed;
             top: 0; left: 0;
@@ -35,7 +34,7 @@
             z-index: 0;
         }
 
-        /* Floating Hearts Animation */
+        /* Floating Hearts */
         .hearts-container {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -137,17 +136,17 @@
             padding: 15px 25px;
         }
 
-        /* --- NO BUTTON --- */
+        /* --- NO BUTTON (The Runner) --- */
         #noBtn {
-            background: #000; /* Dark Black */
-            color: #fff;      /* White Text */
+            background: #000; 
+            color: #fff;      
             border: 2px solid #FF69B4; 
             box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            position: relative; /* Starts relative */
-            z-index: 9999; /* Ensure it floats ABOVE everything */
+            position: relative; 
+            z-index: 9999; /* Highest priority */
+            transition: top 0.2s ease, left 0.2s ease; /* Smooth movement */
         }
 
-        /* Hide pages by default */
         #pleading-page, #success-page {
             display: none;
             animation: fadeIn 1s ease;
@@ -197,7 +196,7 @@
         </div>
 
         <div class="btn-group">
-            <button id="forceYesBtn">Main to sirf aapki hi begum hun 🙈</button>
+            <button id="forceYesBtn">Main to aapki sirf hi begum hun 🙈</button>
         </div>
     </div>
 
@@ -209,12 +208,12 @@
             <p>Dil dhoondta hai panaah sirf aapke saaye mein har ghadi,</p>
             <p>Kyunki meri har saans ab aapki mohabbat ki mohtaaj lagti hai.</p>
             
-            <h1 style="font-size: 3.5rem;">mujhe aapse be-inteha ishq hain❤️</h1>
+            <h1 style="font-size: 3.5rem;">I Love You ❤️</h1>
         </div>
     </div>
 
     <script>
-        // --- HEARTS LOGIC ---
+        // --- HEARTS ---
         function createHeart() {
             const heart = document.createElement('div');
             heart.classList.add('heart');
@@ -222,13 +221,12 @@
             heart.style.left = Math.random() * 100 + 'vw';
             heart.style.animationDuration = Math.random() * 3 + 4 + 's'; 
             heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
-            
             document.getElementById('hearts-container').appendChild(heart);
             setTimeout(() => { heart.remove(); }, 7000);
         }
         setInterval(createHeart, 300);
 
-        // --- BUTTON LOGIC ---
+        // --- BUTTON VARIABLES ---
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const forceYesBtn = document.getElementById('forceYesBtn');
@@ -239,7 +237,11 @@
 
         let noClickCount = 0;
 
-        const handleNoInteraction = () => {
+        // --- THE NEW "SAFE" MATH ---
+        const handleNoInteraction = (e) => {
+            // Prevent default touch behavior (double firing)
+            if (e.type === 'touchstart') e.preventDefault();
+
             noClickCount++; 
 
             if (noClickCount >= 5) {
@@ -249,30 +251,36 @@
                 return; 
             }
 
-            // --- FIXED MATH FOR SAFE ZONE ---
-            // Get the width/height of the button
-            const btnWidth = noBtn.offsetWidth;
-            const btnHeight = noBtn.offsetHeight;
+            // --- STRICT "SAFE CAGE" LOGIC ---
+            // 1. Get screen dimensions
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+
+            // 2. Define a "Safe Box" in the middle (avoid edges)
+            // Button can only go between 10% and 90% of screen width
+            // Button can only go between 10% and 90% of screen height
+            const minX = screenW * 0.1; 
+            const maxX = screenW * 0.9 - noBtn.offsetWidth;
             
-            // Get the safe area (Screen size minus button size minus 20px padding)
-            const maxLeft = window.innerWidth - btnWidth - 20;
-            const maxTop = window.innerHeight - btnHeight - 20;
+            const minY = screenH * 0.1;
+            const maxY = screenH * 0.9 - noBtn.offsetHeight;
 
-            // Generate random positions ensuring they are never negative
-            // Math.max(0, ...) ensures it never goes off the top/left
-            const randomLeft = Math.max(0, Math.floor(Math.random() * maxLeft));
-            const randomTop = Math.max(0, Math.floor(Math.random() * maxTop));
+            // 3. Generate random numbers strictly inside that box
+            const randomX = Math.random() * (maxX - minX) + minX;
+            const randomY = Math.random() * (maxY - minY) + minY;
 
-            // Apply the new position
+            // 4. Apply absolute positioning
             noBtn.style.position = 'fixed'; 
-            noBtn.style.left = randomLeft + 'px';
-            noBtn.style.top = randomTop + 'px';
+            noBtn.style.left = randomX + 'px';
+            noBtn.style.top = randomY + 'px';
         };
 
+        // Add listeners for both touch and mouse
         noBtn.addEventListener('mouseover', handleNoInteraction);
         noBtn.addEventListener('click', handleNoInteraction);
         noBtn.addEventListener('touchstart', handleNoInteraction);
 
+        // YES Button Logic
         yesBtn.addEventListener('click', goToSuccess);
         forceYesBtn.addEventListener('click', () => {
             pleadingPage.style.display = 'none'; 
