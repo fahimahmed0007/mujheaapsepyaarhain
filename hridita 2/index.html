@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>For My Universe</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Nunito:wght@700&display=swap" rel="stylesheet">
+
     <style>
         /* --- DYNAMIC THEME --- */
         body {
@@ -12,7 +15,7 @@
             background-size: cover;
             
             color: #FFB7B2;
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Nunito', sans-serif; /* Default clean font */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -28,8 +31,29 @@
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.4); /* Slightly darker for better text read */
             z-index: 0;
+        }
+
+        /* Floating Hearts Animation Background */
+        .hearts-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .heart {
+            position: absolute;
+            bottom: -10vh;
+            color: rgba(255, 105, 180, 0.6);
+            animation: floatUp 10s linear infinite;
+            font-size: 20px;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
 
         /* Container Style */
@@ -37,37 +61,39 @@
             width: 85%;
             max-width: 500px;
             padding: 25px;
-            background: rgba(0, 0, 0, 0.3); 
-            border: 1px solid rgba(255, 105, 180, 0.6);
+            background: rgba(0, 0, 0, 0.5); /* Glass effect */
+            border: 2px solid rgba(255, 105, 180, 0.6);
             border-radius: 20px;
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.2);
+            box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
             position: relative;
             z-index: 10;
+            backdrop-filter: blur(3px); /* Blur background slightly */
         }
 
         /* Text Styles */
         p.shayari {
+            font-family: 'Nunito', sans-serif; /* Clean font for reading */
             font-size: 1.1rem;
             line-height: 1.5;
             color: #fff;
             margin-bottom: 15px;
-            text-shadow: 2px 2px 4px #000, 0 0 10px #FF69B4;
-            font-weight: bold;
+            text-shadow: 2px 2px 4px #000;
+            font-weight: 700;
         }
 
-        .highlight {
+        /* The BIG Question & Titles get the Handwriting Font */
+        .highlight, h1 {
+            font-family: 'Sacramento', cursive;
             color: #FF69B4;
-            font-weight: bold;
-            font-size: 1.6rem;
+            font-weight: normal;
+            font-size: 2.5rem; /* Bigger for cursive */
             display: block;
-            margin-top: 25px;
-            text-shadow: 3px 3px 0 #000, 0 0 15px #FF69B4;
-            text-transform: uppercase;
+            margin-top: 15px;
+            text-shadow: 2px 2px 2px #000, 0 0 15px #FF69B4;
         }
         
-        /* Specific style for the plea text */
         .plea-text {
-            color: #FF69B4; /* Pink text for the plea */
+            color: #FF69B4; 
             font-size: 1.2rem;
             margin-top: 20px;
             font-weight: bold;
@@ -76,7 +102,7 @@
 
         /* Buttons */
         .btn-group {
-            margin-top: 30px;
+            margin-top: 25px;
             width: 100%;
             display: flex;
             justify-content: center; 
@@ -88,19 +114,23 @@
 
         button {
             padding: 12px 30px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             border-radius: 50px;
             border: none;
             cursor: pointer;
             font-weight: bold;
-            font-family: sans-serif;
+            font-family: 'Nunito', sans-serif;
             white-space: nowrap;
-            transition: transform 0.2s;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.95);
         }
 
         #yesBtn, #forceYesBtn {
             background-color: #FF69B4;
-            color: #000;
+            color: #fff;
             box-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
             position: relative; 
             z-index: 100;
@@ -108,14 +138,14 @@
         
         #forceYesBtn {
             white-space: normal;
-            font-size: 0.9rem;
-            padding: 15px 20px;
+            font-size: 1rem;
+            padding: 15px 25px;
         }
 
         #noBtn {
-            background: rgba(0,0,0,0.8);
+            background: rgba(255, 255, 255, 0.1);
             color: #fff;
-            border: 1px solid #FF69B4;
+            border: 2px solid #FF69B4;
             position: relative;
             z-index: 1;
         }
@@ -127,7 +157,7 @@
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.9); }
+            from { opacity: 0; transform: scale(0.95); }
             to { opacity: 1; transform: scale(1); }
         }
 
@@ -136,6 +166,8 @@
 <body>
 
     <div class="overlay"></div>
+    
+    <div class="hearts-container" id="hearts-container"></div>
 
     <div class="container" id="proposal-page">
         <div class="shayari">
@@ -181,12 +213,33 @@
             <p>Dil dhoondta hai panaah sirf aapke saaye mein har ghadi,</p>
             <p>Kyunki meri har saans ab aapki mohabbat ki mohtaaj lagti hai.</p>
             
-            <h1 style="font-size: 3rem;">❤️</h1>
+            <h1 style="font-size: 3.5rem;">I Love You ❤️</h1>
         </div>
     </div>
 
     <script>
-        // Variables
+        // --- 1. FLOATING HEARTS LOGIC ---
+        function createHeart() {
+            const heart = document.createElement('div');
+            heart.classList.add('heart');
+            heart.innerHTML = '❤';
+            heart.style.left = Math.random() * 100 + 'vw';
+            heart.style.animationDuration = Math.random() * 3 + 4 + 's'; // 4s to 7s speed
+            heart.style.fontSize = Math.random() * 20 + 15 + 'px'; // Random size
+            
+            document.getElementById('hearts-container').appendChild(heart);
+            
+            // Remove heart after animation to keep browser clean
+            setTimeout(() => {
+                heart.remove();
+            }, 7000);
+        }
+
+        // Create a new heart every 300ms
+        setInterval(createHeart, 300);
+
+
+        // --- 2. BUTTON LOGIC ---
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const forceYesBtn = document.getElementById('forceYesBtn');
@@ -195,24 +248,18 @@
         const pleadingPage = document.getElementById('pleading-page');
         const successPage = document.getElementById('success-page');
 
-        // Counter for "No" attempts
         let noClickCount = 0;
 
-        // --- LOGIC FOR NO BUTTON ---
         const handleNoInteraction = () => {
             noClickCount++; 
 
-            // If she tries 5 times, switch to Pleading Page
             if (noClickCount >= 5) {
                 proposalPage.style.display = 'none'; 
                 pleadingPage.style.display = 'block'; 
-                
-                // FORCE BACKGROUND CHANGE TO KITTY
                 document.body.style.backgroundImage = "url('kitty.gif')";
                 return; 
             }
 
-            // Otherwise, keep running away
             const maxX = window.innerWidth - noBtn.offsetWidth - 50;
             const maxY = window.innerHeight - noBtn.offsetHeight - 50;
             const randomX = Math.random() * maxX;
@@ -227,17 +274,12 @@
         noBtn.addEventListener('click', handleNoInteraction);
         noBtn.addEventListener('touchstart', handleNoInteraction);
 
-        // --- LOGIC FOR YES BUTTONS ---
-        yesBtn.addEventListener('click', () => {
-            goToSuccess();
-        });
-
+        yesBtn.addEventListener('click', goToSuccess);
         forceYesBtn.addEventListener('click', () => {
             pleadingPage.style.display = 'none'; 
             goToSuccess(); 
         });
 
-        // --- SUCCESS FUNCTION ---
         function goToSuccess() {
             proposalPage.style.display = 'none';
             successPage.style.display = 'block';
@@ -246,4 +288,3 @@
     </script>
 </body>
 </html>
-
