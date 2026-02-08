@@ -6,12 +6,13 @@
     <title>For My Universe</title>
     
     <link href="https://fonts.googleapis.com/css2?family=Sacramento&family=Nunito:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* --- DYNAMIC THEME --- */
+        /* --- THEME & ANIMATIONS --- */
         body {
-            /* PAGE 1 START: Hamster Pleading */
-            background: url('hamster-pleading.gif') no-repeat center center fixed; 
+            /* START: The Golden Mountain Background */
+            background: url('intro-bg.jpg') no-repeat center center fixed; 
             background-size: cover;
             
             color: #FFB7B2;
@@ -21,95 +22,76 @@
             align-items: center;
             min-height: 100vh;
             margin: 0;
-            overflow: hidden; /* Stops scrolling */
+            overflow: hidden;
             text-align: center;
-            transition: background 0.5s ease;
+            transition: background 0.8s ease-in-out; /* Slower transition for drama */
         }
 
         .overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.3);
+            background: rgba(0, 0, 0, 0.5); /* Darker overlay for text readability */
             z-index: 0;
-        }
-
-        /* Floating Hearts */
-        .hearts-container {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none;
-            z-index: 1;
-        }
-        
-        .heart {
-            position: absolute;
-            bottom: -10vh;
-            color: rgba(255, 105, 180, 0.6);
-            animation: floatUp 10s linear infinite;
-            font-size: 20px;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; }
         }
 
         /* Container Style */
         .container {
             width: 85%;
             max-width: 500px;
-            padding: 25px;
+            padding: 30px;
             background: rgba(0, 0, 0, 0.6); 
             border: 2px solid rgba(255, 105, 180, 0.6);
             border-radius: 20px;
             box-shadow: 0 0 30px rgba(255, 105, 180, 0.3);
             position: relative;
             z-index: 10;
-            backdrop-filter: blur(3px);
+            backdrop-filter: blur(5px);
+            transition: opacity 0.5s ease;
+        }
+
+        /* INPUT FIELDS (For Name & Answer) */
+        input, textarea {
+            width: 90%;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 2px solid #FF69B4;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1.1rem;
+            outline: none;
+        }
+        
+        textarea {
+            height: 100px;
+            resize: none;
+        }
+
+        input::placeholder, textarea::placeholder {
+            color: rgba(255, 255, 255, 0.7);
         }
 
         /* Text Styles */
-        p.shayari {
-            font-family: 'Nunito', sans-serif;
-            font-size: 1.1rem;
-            line-height: 1.5;
+        p.shayari, label {
+            font-size: 1.2rem;
+            line-height: 1.6;
             color: #fff;
             margin-bottom: 15px;
             text-shadow: 2px 2px 4px #000;
             font-weight: 700;
         }
 
-        .highlight, h1 {
+        h1 {
             font-family: 'Sacramento', cursive;
             color: #FF69B4;
-            font-weight: normal;
             font-size: 2.5rem;
-            display: block;
-            margin-top: 15px;
+            margin-bottom: 20px;
             text-shadow: 2px 2px 2px #000, 0 0 15px #FF69B4;
-        }
-        
-        .plea-text {
-            color: #FF69B4; 
-            font-size: 1.2rem;
-            margin-top: 20px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px #000;
         }
 
         /* Buttons */
-        .btn-group {
-            margin-top: 25px;
-            width: 100%;
-            display: flex;
-            justify-content: center; 
-            align-items: center;
-            gap: 20px; 
-            min-height: 60px;
-            flex-wrap: wrap;
-        }
-
         button {
             padding: 12px 30px;
             font-size: 1.1rem;
@@ -118,179 +100,198 @@
             cursor: pointer;
             font-weight: bold;
             font-family: 'Nunito', sans-serif;
-            white-space: nowrap;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
+            margin-top: 10px;
         }
 
-        #yesBtn, #forceYesBtn {
+        .next-btn {
             background-color: #FF69B4;
             color: #fff;
             box-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
-            position: relative; 
-            z-index: 100;
-        }
-        
-        #forceYesBtn {
-            white-space: normal;
-            font-size: 1rem;
-            padding: 15px 25px;
         }
 
-        /* --- NO BUTTON (The Runner) --- */
+        /* The Tricky No Button */
         #noBtn {
             background: #000; 
             color: #fff;      
             border: 2px solid #FF69B4; 
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
             position: relative; 
-            z-index: 9999; /* Highest priority */
-            transition: top 0.2s ease, left 0.2s ease; /* Smooth movement */
+            z-index: 9999;
+            transition: top 0.3s ease, left 0.3s ease;
         }
 
-        #pleading-page, #success-page {
+        /* Page Visibility Control */
+        .page {
             display: none;
-            animation: fadeIn 1s ease;
+            animation: fadeIn 0.8s ease;
         }
+        
+        /* Show first page by default */
+        #page-name { display: block; }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+        
+        /* Typewriter Effect */
+        .typewriter h1 {
+            overflow: hidden; 
+            border-right: .15em solid orange; 
+            white-space: nowrap; 
+            margin: 0 auto; 
+            animation: typing 3.5s steps(30, end), blink-caret .75s step-end infinite;
+            max-width: fit-content;
+        }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: #FF69B4; } }
 
     </style>
 </head>
 <body>
 
     <div class="overlay"></div>
-    <div class="hearts-container" id="hearts-container"></div>
 
-    <div class="container" id="proposal-page">
+    <div class="container page" id="page-name">
+        <h1>Welcome, My Universe</h1>
+        <p class="shayari">Before we begin, may I know who owns this heart?</p>
+        <input type="text" id="nameInput" placeholder="Type your name here...">
+        <button class="next-btn" onclick="validateName()">Enter ❤️</button>
+    </div>
+
+    <div class="container page" id="page-why">
+        <h1>Tell me one thing...</h1>
+        <p class="shayari">Why did you think he is the one?</p>
+        <textarea id="whyInput" placeholder="Pour your heart out..."></textarea>
+        <button class="next-btn" onclick="validateAnswer()">Next ✨</button>
+    </div>
+
+    <div class="container page" id="page-proposal">
         <div class="shayari">
             <p>Meri du’ayein tumhara hi zikr karti hain, jab paas nahi hoti tum,<br>
             Meri du’ayein odh le tumhe... chahe kitni bhi door ho tum.</p>
+            <p>Mera dil bas itna poochta hai tumse...</p>
             
-            <p>Meri rooh ke bohot paas, du’aon mein ek mahal banaya hai tumhare liye,<br>
-            Mera dil bas itna poochta hai tumse...</p>
-            
-            <span class="highlight">Kya rahoge wahan tum?</span>
+            <div class="typewriter">
+                <h1>Kya rahoge wahan tum?</h1>
+            </div>
         </div>
 
-        <div class="btn-group">
-            <button id="yesBtn">Haan jii 🖤</button>
-            <button id="noBtn">Nahiiiii 😭😭</button>
+        <div style="margin-top: 25px;">
+            <button class="next-btn" id="yesBtn">Haan jii 🖤</button>
+            <button id="noBtn" style="margin-left: 20px;">Nahiiiii 😭😭</button>
         </div>
     </div>
 
-    <div class="container" id="pleading-page">
+    <div class="container page" id="page-pleading">
         <div class="shayari">
             <p>Na dhuaan maar sakega, na koi sadma maarega,<br>
             Na qaza maaregi mujhko, na ye zamana maarega.</p>
-
-            <p>Jo kheech le jaan is seene se mere,<br>
-            Bas ek tera na hona, ye tasavvur hi mujhe jeete-ji maar dega.</p>
-
-            <p class="plea-text">
+            <p style="color: #FF69B4; font-size: 1.2rem; margin-top: 15px;">
                 Aapke bagair kaun hain mere...<br>
                 minaat hain aapse maan jaaona please 🥺
             </p>
         </div>
-
-        <div class="btn-group">
-            <button id="forceYesBtn">Main to aapki sirf hi begum hun 🙈</button>
-        </div>
+        <button class="next-btn" id="forceYesBtn">Main to aapki sirf hi begum hun 🙈</button>
     </div>
 
-    <div class="container" id="success-page">
+    <div class="container page" id="page-success">
         <div class="shayari">
             <p>Aapki nigah ki wo besaakhta chahat, ab humein pareshaan karti hai,</p>
             <p>Aapki zulfon ki mehek, kaynaat ke har itr se behtar lagti hai. ✨</p>
-            
-            <p>Dil dhoondta hai panaah sirf aapke saaye mein har ghadi,</p>
-            <p>Kyunki meri har saans ab aapki mohabbat ki mohtaaj lagti hai.</p>
-            
-            <h1 style="font-size: 3.5rem;">I Love You ❤️</h1>
+            <h1 style="font-size: 3.5rem; margin-top:20px;">I Love You ❤️</h1>
         </div>
     </div>
 
     <script>
-        // --- HEARTS ---
-        function createHeart() {
-            const heart = document.createElement('div');
-            heart.classList.add('heart');
-            heart.innerHTML = '❤';
-            heart.style.left = Math.random() * 100 + 'vw';
-            heart.style.animationDuration = Math.random() * 3 + 4 + 's'; 
-            heart.style.fontSize = Math.random() * 20 + 15 + 'px'; 
-            document.getElementById('hearts-container').appendChild(heart);
-            setTimeout(() => { heart.remove(); }, 7000);
-        }
-        setInterval(createHeart, 300);
+        // --- NAVIGATION LOGIC ---
 
-        // --- BUTTON VARIABLES ---
+        function validateName() {
+            const name = document.getElementById('nameInput').value;
+            if (name.trim() === "") {
+                alert("Please tell me your name first! 🥺");
+            } else {
+                // Switch to Page 2
+                document.getElementById('page-name').style.display = 'none';
+                document.getElementById('page-why').style.display = 'block';
+                // Change Background to the MOON image
+                document.body.style.backgroundImage = "url('question-bg.jpg')";
+            }
+        }
+
+        function validateAnswer() {
+            const answer = document.getElementById('whyInput').value;
+            if (answer.trim() === "") {
+                alert("You have to answer this one! Why him? 🥺");
+            } else {
+                // Switch to Page 3 (Proposal)
+                document.getElementById('page-why').style.display = 'none';
+                document.getElementById('page-proposal').style.display = 'block';
+                // Change Background to HAMSTER
+                document.body.style.backgroundImage = "url('hamster-pleading.gif')";
+            }
+        }
+
+        // --- BUTTON TRICK LOGIC (For Proposal Page) ---
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const forceYesBtn = document.getElementById('forceYesBtn');
-        
-        const proposalPage = document.getElementById('proposal-page');
-        const pleadingPage = document.getElementById('pleading-page');
-        const successPage = document.getElementById('success-page');
-
         let noClickCount = 0;
 
-        // --- THE NEW "SAFE" MATH ---
         const handleNoInteraction = (e) => {
-            // Prevent default touch behavior (double firing)
             if (e.type === 'touchstart') e.preventDefault();
-
             noClickCount++; 
 
             if (noClickCount >= 5) {
-                proposalPage.style.display = 'none'; 
-                pleadingPage.style.display = 'block'; 
+                document.getElementById('page-proposal').style.display = 'none';
+                document.getElementById('page-pleading').style.display = 'block';
+                // Change BG to KITTY
                 document.body.style.backgroundImage = "url('kitty.gif')";
                 return; 
             }
 
-            // --- STRICT "SAFE CAGE" LOGIC ---
-            // 1. Get screen dimensions
+            // Move the button safely
             const screenW = window.innerWidth;
             const screenH = window.innerHeight;
-
-            // 2. Define a "Safe Box" in the middle (avoid edges)
-            // Button can only go between 10% and 90% of screen width
-            // Button can only go between 10% and 90% of screen height
             const minX = screenW * 0.1; 
             const maxX = screenW * 0.9 - noBtn.offsetWidth;
-            
             const minY = screenH * 0.1;
             const maxY = screenH * 0.9 - noBtn.offsetHeight;
-
-            // 3. Generate random numbers strictly inside that box
             const randomX = Math.random() * (maxX - minX) + minX;
             const randomY = Math.random() * (maxY - minY) + minY;
 
-            // 4. Apply absolute positioning
             noBtn.style.position = 'fixed'; 
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
         };
 
-        // Add listeners for both touch and mouse
         noBtn.addEventListener('mouseover', handleNoInteraction);
         noBtn.addEventListener('click', handleNoInteraction);
         noBtn.addEventListener('touchstart', handleNoInteraction);
 
-        // YES Button Logic
+        // --- SUCCESS LOGIC ---
         yesBtn.addEventListener('click', goToSuccess);
         forceYesBtn.addEventListener('click', () => {
-            pleadingPage.style.display = 'none'; 
+            document.getElementById('page-pleading').style.display = 'none'; 
             goToSuccess(); 
         });
 
         function goToSuccess() {
-            proposalPage.style.display = 'none';
-            successPage.style.display = 'block';
+            document.getElementById('page-proposal').style.display = 'none';
+            document.getElementById('page-success').style.display = 'block';
+            // Change BG to BEARS
             document.body.style.backgroundImage = "url('animation.gif')"; 
+            triggerConfetti();
+        }
+
+        function triggerConfetti() {
+            const duration = 3000;
+            const end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#ff69b4', '#ffb7b2'] });
+                confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#ff69b4', '#ffb7b2'] });
+                if (Date.now() < end) requestAnimationFrame(frame);
+            }());
         }
     </script>
 </body>
