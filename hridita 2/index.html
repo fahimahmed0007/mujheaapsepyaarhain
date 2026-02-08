@@ -9,12 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
-        /* --- THEME & ANIMATIONS --- */
+        /* --- THEME --- */
         body {
-            /* START: The Golden Mountain Background */
             background: url('intro-bg.jpg') no-repeat center center fixed; 
             background-size: cover;
-            
             color: #FFB7B2;
             font-family: 'Nunito', sans-serif;
             display: flex;
@@ -24,18 +22,17 @@
             margin: 0;
             overflow: hidden;
             text-align: center;
-            transition: background 0.8s ease-in-out; /* Slower transition for drama */
+            transition: background 0.8s ease-in-out;
         }
 
         .overlay {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5); /* Darker overlay for text readability */
+            background: rgba(0, 0, 0, 0.5);
             z-index: 0;
         }
 
-        /* Container Style */
         .container {
             width: 85%;
             max-width: 500px;
@@ -47,10 +44,8 @@
             position: relative;
             z-index: 10;
             backdrop-filter: blur(5px);
-            transition: opacity 0.5s ease;
         }
 
-        /* INPUT FIELDS (For Name & Answer) */
         input, textarea {
             width: 90%;
             padding: 15px;
@@ -64,17 +59,10 @@
             outline: none;
         }
         
-        textarea {
-            height: 100px;
-            resize: none;
-        }
+        textarea { height: 100px; resize: none; }
+        input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
 
-        input::placeholder, textarea::placeholder {
-            color: rgba(255, 255, 255, 0.7);
-        }
-
-        /* Text Styles */
-        p.shayari, label {
+        p.shayari {
             font-size: 1.2rem;
             line-height: 1.6;
             color: #fff;
@@ -91,7 +79,6 @@
             text-shadow: 2px 2px 2px #000, 0 0 15px #FF69B4;
         }
 
-        /* Buttons */
         button {
             padding: 12px 30px;
             font-size: 1.1rem;
@@ -110,7 +97,6 @@
             box-shadow: 0 0 15px rgba(255, 105, 180, 0.8);
         }
 
-        /* The Tricky No Button */
         #noBtn {
             background: #000; 
             color: #fff;      
@@ -120,13 +106,7 @@
             transition: top 0.3s ease, left 0.3s ease;
         }
 
-        /* Page Visibility Control */
-        .page {
-            display: none;
-            animation: fadeIn 0.8s ease;
-        }
-        
-        /* Show first page by default */
+        .page { display: none; animation: fadeIn 0.8s ease; }
         #page-name { display: block; }
 
         @keyframes fadeIn {
@@ -134,12 +114,9 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Typewriter Effect */
         .typewriter h1 {
-            overflow: hidden; 
-            border-right: .15em solid orange; 
-            white-space: nowrap; 
-            margin: 0 auto; 
+            overflow: hidden; border-right: .15em solid orange; 
+            white-space: nowrap; margin: 0 auto; 
             animation: typing 3.5s steps(30, end), blink-caret .75s step-end infinite;
             max-width: fit-content;
         }
@@ -170,13 +147,10 @@
         <div class="shayari">
             <p>Meri du’ayein tumhara hi zikr karti hain, jab paas nahi hoti tum,<br>
             Meri du’ayein odh le tumhe... chahe kitni bhi door ho tum.</p>
-            <p>Mera dil bas itna poochta hai tumse...</p>
-            
             <div class="typewriter">
                 <h1>Kya rahoge wahan tum?</h1>
             </div>
         </div>
-
         <div style="margin-top: 25px;">
             <button class="next-btn" id="yesBtn">Haan jii 🖤</button>
             <button id="noBtn" style="margin-left: 20px;">Nahiiiii 😭😭</button>
@@ -204,17 +178,20 @@
     </div>
 
     <script>
-        // --- NAVIGATION LOGIC ---
+        // ⚠️ PASTE YOUR GOOGLE SCRIPT URL HERE (Inside the quotes):
+        const scriptURL = 'https://script.google.com/macros/s/AKfycby7wX5oZZzUfqodotbRd-oZnSnJIzEbe1qwaqmVnTN-d_QTyVp1wRVjsUPMW3nB52qBCA/exec';
+
+        let herName = "";
+        let herReason = "";
 
         function validateName() {
             const name = document.getElementById('nameInput').value;
             if (name.trim() === "") {
                 alert("Please tell me your name first! 🥺");
             } else {
-                // Switch to Page 2
+                herName = name; 
                 document.getElementById('page-name').style.display = 'none';
                 document.getElementById('page-why').style.display = 'block';
-                // Change Background to the MOON image
                 document.body.style.backgroundImage = "url('question-bg.jpg')";
             }
         }
@@ -224,15 +201,24 @@
             if (answer.trim() === "") {
                 alert("You have to answer this one! Why him? 🥺");
             } else {
-                // Switch to Page 3 (Proposal)
+                herReason = answer;
+                
+                // --- THIS SENDS DATA TO SHEETS ---
+                const formData = new FormData();
+                formData.append('name', herName);
+                formData.append('reason', herReason);
+                
+                fetch(scriptURL, { method: 'POST', body: formData })
+                    .then(response => console.log('Success!', response))
+                    .catch(error => console.error('Error!', error.message));
+
                 document.getElementById('page-why').style.display = 'none';
                 document.getElementById('page-proposal').style.display = 'block';
-                // Change Background to HAMSTER
                 document.body.style.backgroundImage = "url('hamster-pleading.gif')";
             }
         }
 
-        // --- BUTTON TRICK LOGIC (For Proposal Page) ---
+        // --- BUTTON TRICK ---
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const forceYesBtn = document.getElementById('forceYesBtn');
@@ -245,21 +231,24 @@
             if (noClickCount >= 5) {
                 document.getElementById('page-proposal').style.display = 'none';
                 document.getElementById('page-pleading').style.display = 'block';
-                // Change BG to KITTY
                 document.body.style.backgroundImage = "url('kitty.gif')";
                 return; 
             }
 
-            // Move the button safely
+            // --- THE SAFE ZONE MATH (20% Padding) ---
             const screenW = window.innerWidth;
             const screenH = window.innerHeight;
-            const minX = screenW * 0.1; 
-            const maxX = screenW * 0.9 - noBtn.offsetWidth;
-            const minY = screenH * 0.1;
-            const maxY = screenH * 0.9 - noBtn.offsetHeight;
+            
+            // We force the button to stay within the middle 60% of the screen
+            // (20% margin on left, 20% margin on right)
+            const minX = screenW * 0.2; 
+            const maxX = screenW * 0.8 - noBtn.offsetWidth;
+            const minY = screenH * 0.2;
+            const maxY = screenH * 0.8 - noBtn.offsetHeight;
+            
             const randomX = Math.random() * (maxX - minX) + minX;
             const randomY = Math.random() * (maxY - minY) + minY;
-
+            
             noBtn.style.position = 'fixed'; 
             noBtn.style.left = randomX + 'px';
             noBtn.style.top = randomY + 'px';
@@ -269,7 +258,6 @@
         noBtn.addEventListener('click', handleNoInteraction);
         noBtn.addEventListener('touchstart', handleNoInteraction);
 
-        // --- SUCCESS LOGIC ---
         yesBtn.addEventListener('click', goToSuccess);
         forceYesBtn.addEventListener('click', () => {
             document.getElementById('page-pleading').style.display = 'none'; 
@@ -279,7 +267,6 @@
         function goToSuccess() {
             document.getElementById('page-proposal').style.display = 'none';
             document.getElementById('page-success').style.display = 'block';
-            // Change BG to BEARS
             document.body.style.backgroundImage = "url('animation.gif')"; 
             triggerConfetti();
         }
