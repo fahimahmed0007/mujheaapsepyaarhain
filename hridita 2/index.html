@@ -49,7 +49,7 @@
         input, textarea {
             width: 90%;
             padding: 15px;
-            margin: 20px 0;
+            margin: 20px 0 5px 0; /* Reduced bottom margin for counter */
             border-radius: 10px;
             border: 2px solid #FF69B4;
             background: rgba(255, 255, 255, 0.1);
@@ -59,8 +59,17 @@
             outline: none;
         }
         
-        textarea { height: 100px; resize: none; }
+        textarea { height: 150px; resize: none; } /* Made taller for 100 words */
         input::placeholder, textarea::placeholder { color: rgba(255, 255, 255, 0.7); }
+
+        /* Word Counter Style */
+        #wordCountDisplay {
+            font-size: 0.9rem;
+            color: #ff6b6b; /* Starts Red */
+            margin-bottom: 20px;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
 
         p.shayari {
             font-size: 1.2rem;
@@ -139,7 +148,11 @@
     <div class="container page" id="page-why">
         <h1>Tell me one thing...</h1>
         <p class="shayari">Why did you think he is the one?</p>
+        <p style="font-size: 0.8rem; opacity: 0.8;">(Minimum 100 words required)</p>
+        
         <textarea id="whyInput" placeholder="Pour your heart out..."></textarea>
+        <div id="wordCountDisplay">0 / 100 Words</div>
+        
         <button class="next-btn" onclick="validateAnswer()">Next ✨</button>
     </div>
 
@@ -173,16 +186,34 @@
         <div class="shayari">
             <p>Aapki nigah ki wo besaakhta chahat, ab humein pareshaan karti hai,</p>
             <p>Aapki zulfon ki mehek, kaynaat ke har itr se behtar lagti hai. ✨</p>
-            <h1 style="font-size: 3.5rem; margin-top:20px;">Mujhe aapse  beinteha mohobbat hain ❤️</h1>
+            <h1 style="font-size: 3.5rem; margin-top:20px;">Mujhe aapse beinteha mohobbat hain ❤️</h1>
         </div>
     </div>
 
     <script>
         // ⚠️ PASTE YOUR GOOGLE SCRIPT URL HERE (Inside the quotes):
-        const scriptURL = 'https://script.google.com/macros/s/AKfycby7wX5oZZzUfqodotbRd-oZnSnJIzEbe1qwaqmVnTN-d_QTyVp1wRVjsUPMW3nB52qBCA/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbz02Ydf_2PDd3cP7MZLIN_jlOl0LsYovY7aXii-bdyBCxIi2NNyXX8tKUFueuqrvmsj-w/exec';
 
         let herName = "";
         let herReason = "";
+
+        // --- LIVE WORD COUNTER LOGIC ---
+        const whyInput = document.getElementById('whyInput');
+        const wordCountDisplay = document.getElementById('wordCountDisplay');
+
+        whyInput.addEventListener('input', function() {
+            const text = this.value.trim();
+            // Count words by splitting by spaces (filter removes empty spaces)
+            const count = text.length === 0 ? 0 : text.split(/\s+/).length;
+            
+            wordCountDisplay.innerText = count + " / 100 Words";
+
+            if (count >= 100) {
+                wordCountDisplay.style.color = "#90ee90"; // Green for Good
+            } else {
+                wordCountDisplay.style.color = "#ff6b6b"; // Red for Bad
+            }
+        });
 
         function validateName() {
             const name = document.getElementById('nameInput').value;
@@ -197,13 +228,16 @@
         }
 
         function validateAnswer() {
-            const answer = document.getElementById('whyInput').value;
-            if (answer.trim() === "") {
-                alert("You have to answer this one! Why him? 🥺");
+            const text = document.getElementById('whyInput').value.trim();
+            const wordCount = text.length === 0 ? 0 : text.split(/\s+/).length;
+
+            if (wordCount < 100) {
+                const wordsLeft = 100 - wordCount;
+                alert(`Not yet! You need to write at least ${wordsLeft} more words! 🥺📝`);
             } else {
-                herReason = answer;
+                herReason = text;
                 
-                // --- THIS SENDS DATA TO SHEETS ---
+                // SEND TO SHEETS
                 const formData = new FormData();
                 formData.append('name', herName);
                 formData.append('reason', herReason);
@@ -218,7 +252,7 @@
             }
         }
 
-        // --- BUTTON TRICK ---
+        // --- BUTTON TRICK (Safe Zone) ---
         const noBtn = document.getElementById('noBtn');
         const yesBtn = document.getElementById('yesBtn');
         const forceYesBtn = document.getElementById('forceYesBtn');
@@ -235,12 +269,10 @@
                 return; 
             }
 
-            // --- THE SAFE ZONE MATH (20% Padding) ---
             const screenW = window.innerWidth;
             const screenH = window.innerHeight;
             
-            // We force the button to stay within the middle 60% of the screen
-            // (20% margin on left, 20% margin on right)
+            // Safe Zone: Middle 60% of screen
             const minX = screenW * 0.2; 
             const maxX = screenW * 0.8 - noBtn.offsetWidth;
             const minY = screenH * 0.2;
@@ -283,4 +315,3 @@
     </script>
 </body>
 </html>
-
